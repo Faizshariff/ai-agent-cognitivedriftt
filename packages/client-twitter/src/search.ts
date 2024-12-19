@@ -47,13 +47,27 @@ export class TwitterSearchClient extends ClientBase {
 
     constructor(runtime: IAgentRuntime) {
         // Initialize the client and pass an optional callback to be called when the client is ready
-        super({
+        super(
             runtime,
-        });
+        );
     }
 
     async onReady() {
         this.engageWithSearchTermsLoop();
+    }
+
+    async start() {
+        console.log("Starting TwitterSearchClient");
+        await this.init();
+        await this.onReady();
+    }
+
+    async init() {
+        if (!this.runtime.character.topics || this.runtime.character.topics.length === 0) {
+            console.error("No topics configured in character file");
+            return;
+        }
+        await super.init();
     }
 
     private engageWithSearchTermsLoop() {
@@ -108,7 +122,7 @@ export class TwitterSearchClient extends ClientBase {
 
             const prompt = `
   Here are some tweets related to the search term "${searchTerm}":
-  
+
   ${[...slicedTweets, ...homeTimeline]
       .filter((tweet) => {
           // ignore tweets where any of the thread tweets contain a tweet by the bot
@@ -126,7 +140,7 @@ export class TwitterSearchClient extends ClientBase {
   `
       )
       .join("\n")}
-  
+
   Which tweet is the most interesting and relevant for Ruby to reply to? Please provide only the ID of the tweet in your response.
   Notes:
     - Respond to English tweets only
@@ -231,7 +245,7 @@ export class TwitterSearchClient extends ClientBase {
                     .getService<IImageDescriptionService>(
                         ServiceType.IMAGE_DESCRIPTION
                     )
-                    .getInstance()
+
                     .describeImage(photo.url);
                 imageDescriptions.push(description);
             }
@@ -241,7 +255,7 @@ export class TwitterSearchClient extends ClientBase {
                 twitterUserName: this.runtime.getSetting("TWITTER_USERNAME"),
                 timeline: formattedHomeTimeline,
                 tweetContext: `${tweetBackground}
-  
+
   Original Post:
   By @${selectedTweet.username}
   ${selectedTweet.text}${replyContext.length > 0 && `\nReplies to original post:\n${replyContext}`}
