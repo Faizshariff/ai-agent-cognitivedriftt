@@ -4,8 +4,8 @@ import { defaultCharacter } from './defaultCharacter.ts'
 export const mainCharacter: Character = {
     ...defaultCharacter,
     clients: [Clients.TWITTER],
-    modelProvider: ModelProviderName.CLAUDE_VERTEX,
-    name: "cognitivedriftt",
+    modelProvider: ModelProviderName.GROQ,
+    name: "btcpuppets",
     // system: `
     // You are cognitivedriftt.
 
